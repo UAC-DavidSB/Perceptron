@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perceptrón OR Lógico - Infografía</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0e27;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 92, 159, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(88, 166, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(120, 119, 198, 0.1) 0%, rgba(255, 92, 159, 0.1) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            to { left: 100%; }
+        }
+        
+        .header h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #7877c6 0%, #ff5c9f 50%, #58a6ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            letter-spacing: -2px;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+        }
+        
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7877c6, #ff5c9f, #58a6ff);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(120, 119, 198, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .icon {
+            font-size: 1.3em;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        
+        .truth-table-wrapper {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #7877c6 0%, #ff5c9f 100%);
+            color: white;
+            padding: 18px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+        
+        th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+        
+        td {
+            padding: 18px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        tr td:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+        
+        tr td:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+        
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .table-note {
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95em;
+            font-style: italic;
+        }
+        
+        .architecture-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            padding: 30px;
+        }
+        
+        .inputs-layer {
+            display: flex;
+            gap: 60px;
+        }
+        
+        .node {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.4em;
+            border-radius: 50%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .node:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .input-node {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 10px 60px rgba(16, 185, 129, 0.7); }
+        }
+        
+        .weight-tag {
+            position: absolute;
+            bottom: -30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.6em;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .arrow {
+            font-size: 2.5em;
+            color: #7877c6;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .neuron-node {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #7877c6 0%, #ff5c9f 100%);
+            font-size: 2.5em;
+            animation: rotate 8s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { filter: hue-rotate(0deg); }
+            to { filter: hue-rotate(360deg); }
+        }
+        
+        .activation-box {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px 40px;
+            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .output-node {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse 2s infinite 1s;
+        }
+        
+        .func-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        
+        .func-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .func-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .func-card:hover::after {
+            opacity: 1;
+        }
+        
+        .func-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .func-card h3 {
+            color: #58a6ff;
+            margin-bottom: 12px;
+            font-size: 1.15em;
+            font-weight: 600;
+        }
+        
+        .func-card code {
+            background: rgba(0, 0, 0, 0.4);
+            color: #10b981;
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: block;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .func-card p {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85em;
+        }
+        
+        .training-timeline {
+            position: relative;
+            padding-left: 50px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #7877c6, #ff5c9f, #58a6ff);
+        }
+        
+        .step {
+            position: relative;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border-left: 3px solid #7877c6;
+            transition: all 0.3s ease;
+        }
+        
+        .step:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(10px);
+        }
+        
+        .step::before {
+            content: attr(data-step);
+            position: absolute;
+            left: -42px;
+            top: 25px;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #7877c6, #ff5c9f);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9em;
+            box-shadow: 0 5px 20px rgba(120, 119, 198, 0.5);
+        }
+        
+        .step h3 {
+            color: white;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .step p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.7;
+        }
+        
+        .formula {
+            background: rgba(0, 0, 0, 0.5);
+            color: #58a6ff;
+            padding: 18px;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.15em;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            box-shadow: 0 5px 20px rgba(88, 166, 255, 0.2);
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(120, 119, 198, 0.15), rgba(255, 92, 159, 0.15));
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .highlight-box strong {
+            color: #58a6ff;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-box ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .highlight-box li {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        .highlight-box li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #ff5c9f;
+            font-size: 1.2em;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+            padding: 35px;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-box p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .note-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #58a6ff;
+        }
+        
+        .note-box strong {
+            color: #58a6ff;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .note-box p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.2em; }
+            .grid-layout { grid-template-columns: 1fr; }
+            .inputs-layer { gap: 30px; }
+            .func-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Perceptrón Simple: OR Lógico</h1>
+            <p>Red Neuronal Artificial de una sola capa</p>
+        </div>
+        
+        <div class="grid-layout">
+            <!-- Tabla de verdad -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">📊</span>
+                    Tabla de Verdad
+                </h2>
+                <div class="truth-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>x₁</th>
+                                <th>x₂</th>
+                                <th>y</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>0</td>
+                                <td style="color: #ef4444;">0</td>
+                            </tr>
+                            <tr>
+                                <td>0</td>
+                                <td>1</td>
+                                <td style="color: #10b981;">1</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>0</td>
+                                <td style="color: #10b981;">1</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>1</td>
+                                <td style="color: #10b981;">1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="table-note">OR retorna 1 si al menos una entrada es 1</p>
+                </div>
+            </div>
+            
+            <!-- Arquitectura -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">🏗️</span>
+                    Arquitectura
+                </h2>
+                <div class="architecture-diagram">
+                    <div class="inputs-layer">
+                        <div class="node input-node">
+                            x₁
+                            <span class="weight-tag">w₁</span>
+                        </div>
+                        <div class="node input-node">
+                            x₂
+                            <span class="weight-tag">w₂</span>
+                        </div>
+                    </div>
+                    <div class="arrow">⬇</div>
+                    <div class="node neuron-node">Σ</div>
+                    <div class="arrow">⬇</div>
+                    <div class="activation-box">σ(x) Activación</div>
+                    <div class="arrow">⬇</div>
+                    <div class="node output-node">y</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Funciones de activación -->
+        <div class="card">
+            <h2 class="card-title">
+                <span class="icon">⚡</span>
+                Funciones de Activación
+            </h2>
+            <div class="func-grid">
+                <div class="func-card">
+                    <h3>🔢 Step</h3>
+                    <code>1 if x ≥ 0 else 0</code>
+                    <p>Salida binaria</p>
+                </div>
+                <div class="func-card">
+                    <h3>📈 Sigmoid</h3>
+                    <code>1 / (1 + e⁻ˣ)</code>
+                    <p>Rango [0, 1]</p>
+                </div>
+                <div class="func-card">
+                    <h3>🌊 Tanh</h3>
+                    <code>(eˣ - e⁻ˣ) / (eˣ + e⁻ˣ)</code>
+                    <p>Rango [-1, 1]</p>
+                </div>
+                <div class="func-card">
+                    <h3>⚡ ReLU</h3>
+                    <code>max(0, x)</code>
+                    <p>Solo valores positivos</p>
+                </div>
+                <div class="func-card">
+                    <h3>📏 Linear</h3>
+                    <code>f(x) = x</code>
+                    <p>Sin transformación</p>
+                </div>
+                <div class="func-card">
+                    <h3>🎯 Softmax</h3>
+                    <code>eˣⁱ / Σeˣʲ</code>
+                    <p>Clasificación múltiple</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Proceso de entrenamiento -->
+        <div class="card">
+            <h2 class="card-title">
+                <span class="icon">🎓</span>
+                Proceso de Entrenamiento
+            </h2>
+            <div class="training-timeline">
+                <div class="timeline-line"></div>
+                
+                <div class="step" data-step="1">
+                    <h3>Inicialización</h3>
+                    <p>Pesos aleatorios (w₁, w₂) y bias (b) entre -1 y 1</p>
+                </div>
+                
+                <div class="step" data-step="2">
+                    <h3>Predicción</h3>
+                    <p>Suma ponderada de entradas:</p>
+                    <div class="formula">z = w₁·x₁ + w₂·x₂ + b</div>
+                    <p>Aplicar activación: y_pred = σ(z)</p>
+                </div>
+                
+                <div class="step" data-step="3">
+                    <h3>Cálculo del Error</h3>
+                    <div class="formula">error = y_real - y_pred</div>
+                </div>
+                
+                <div class="step" data-step="4">
+                    <h3>Actualización de Pesos</h3>
+                    <div class="formula">
+                        wᵢ = wᵢ + η · error · xᵢ<br>
+                        b = b + η · error
+                    </div>
+                    <p>η (tasa de aprendizaje) = 0.1</p>
+                </div>
+                
+                <div class="step" data-step="5">
+                    <h3>Repetir</h3>
+                    <p>20 épocas sobre todos los datos</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid-layout">
+            <!-- Configuración -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">⚙️</span>
+                    Configuración
+                </h2>
+                <div class="highlight-box">
+                    <strong>Parámetros del Modelo</strong>
+                    <ul>
+                        <li>Entradas: 2 (x₁, x₂)</li>
+                        <li>Tasa de aprendizaje: 0.1</li>
+                        <li>Activación: Sigmoid</li>
+                        <li>Épocas: 20</li>
+                        <li>Objetivo: OR lógico</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Resultado -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span class="icon">🎯</span>
+                    Resultado
+                </h2>
+                <div class="result-box">
+                    <p>
+                        Después de 20 épocas, el perceptrón clasifica correctamente las 4 combinaciones de OR. Los pesos convergen hasta minimizar el error total.
+                    </p>
+                    <div class="note-box">
+                        <strong>💡 Nota Importante</strong>
+                        <p>
+                            El perceptrón simple resuelve problemas linealmente separables (OR, AND, NOT) pero NO puede resolver XOR.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
