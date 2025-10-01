@@ -74,13 +74,29 @@ namespace PerceptronClima
         {
             var datosEntrenamiento = new List<(double[] entradas, double salida)>
             {
-                (new double[]{30, 40, 1015}, 0),
-                (new double[]{22, 85, 1008}, 1),
-                (new double[]{25, 70, 1010}, 1),
-                (new double[]{35, 30, 1018}, 0),
-                (new double[]{20, 90, 1005}, 1),
-                (new double[]{28, 60, 1012}, 0)
+                (new double[]{18, 90, 1006}, 1),
+                (new double[]{20, 85, 1007}, 1),
+                (new double[]{22, 80, 1008}, 1),
+                (new double[]{24, 75, 1010}, 0),
+                (new double[]{26, 65, 1012}, 0),
+                (new double[]{28, 60, 1013}, 0),
+                (new double[]{30, 50, 1015}, 0),
+                (new double[]{19, 88, 1005}, 1),
+                (new double[]{21, 82, 1008}, 1),
+                (new double[]{23, 70, 1010}, 0),
+                (new double[]{25, 68, 1011}, 0),
+                (new double[]{27, 55, 1014}, 0),
+                (new double[]{17, 92, 1004}, 1),
+                (new double[]{18, 89, 1006}, 1),
+                (new double[]{29, 58, 1015}, 0),
+                (new double[]{31, 48, 1016}, 0),
+                (new double[]{20, 83, 1007}, 1),
+                (new double[]{22, 78, 1009}, 0),
+                (new double[]{24, 72, 1011}, 0),
+                (new double[]{19, 87, 1006}, 1)
             };
+
+
 
             // Normalizacion simple (opcional)
             for (int i = 0; i < datosEntrenamiento.Count; i++)
@@ -89,10 +105,10 @@ namespace PerceptronClima
                     datosEntrenamiento[i].entradas[j] /= 100.0; // Escalar valores
             }
 
-            var perceptron = new Perceptron(3, 0.1, "sigmoid");
+            var perceptron = new Perceptron(3, 0.3, "escalon");
 
             Console.WriteLine("Entrenando perceptron para prediccion del clima...");
-            perceptron.Entrenar(datosEntrenamiento, 30);
+            perceptron.Entrenar(datosEntrenamiento, 200);
 
             Console.WriteLine("\n=== Pruebas ===");
             foreach (var dato in datosEntrenamiento)
